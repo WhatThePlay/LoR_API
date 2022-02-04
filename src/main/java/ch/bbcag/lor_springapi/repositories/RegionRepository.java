@@ -9,5 +9,4 @@ public interface RegionRepository extends CrudRepository<Region, Integer> {
 
     @Query("SELECT i FROM Region i WHERE i.name LIKE CONCAT('%', :name, '%')")
     Iterable<Region> findByName(@Param("name") String name);
-
 }

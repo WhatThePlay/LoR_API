@@ -9,6 +9,10 @@ import java.util.List;
 
 public class TestDataUtil {
 
+    public static Region getTestRegion() {
+        return getTestRegions().get(0);
+    }
+
     public static List<Region> getTestRegions() {
         List<Region> regions = new ArrayList<>(); //item
         HashSet<Card> cards = new HashSet<>(); // tag

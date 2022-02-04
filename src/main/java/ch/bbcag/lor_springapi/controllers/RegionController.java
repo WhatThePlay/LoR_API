@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/region")
@@ -26,6 +27,15 @@ public class RegionController {
             return regionRepository.findAll();
         }
         return regionRepository.findByName(name);
+    }
+
+    @GetMapping(path = "{id}")
+    public Region findById(@Parameter(description = "Id of region to get") @PathVariable Integer id) {
+        try {
+            return regionRepository.findById(id).orElseThrow();
+        } catch (NoSuchElementException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Region could not be found");
+        }
     }
 
     @PostMapping(consumes = "application/json")
@@ -48,11 +58,11 @@ public class RegionController {
     }
 
     @DeleteMapping("{id}")
-    public void delete(@Parameter(description = "Id of region to delete") @PathVariable Integer id) {
+    public void deleteById(@Parameter(description = "Id of region to delete") @PathVariable Integer id) {
         try {
             regionRepository.deleteById(id);
         } catch (EmptyResultDataAccessException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tag could not be deleted");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Region could not be deleted");
         }
     }
 
