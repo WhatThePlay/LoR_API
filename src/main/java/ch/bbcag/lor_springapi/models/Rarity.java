@@ -54,9 +54,10 @@ public class Rarity {
         this.coinCost = coinCost;
     }
 
-    public Set<Card> getCards() {
-        return cards;
-    }
+    // Don't show every card for every Rarity when getting rarities
+//    public Set<Card> getCards() {
+//        return cards;
+//    }
 
     public void setCards(Set<Card> cards) {
         this.cards = cards;

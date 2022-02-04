@@ -1,15 +1,17 @@
 package ch.bbcag.lor_springapi.controllers;
 
-import ch.bbcag.lor_springapi.models.Card;
 import ch.bbcag.lor_springapi.models.Region;
 import ch.bbcag.lor_springapi.repositories.RegionRepository;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/region")
@@ -25,4 +27,33 @@ public class RegionController {
         }
         return regionRepository.findByName(name);
     }
+
+    @PostMapping(consumes = "application/json")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void insert(@Parameter(description = "The new Region to create") @Valid @RequestBody Region newRegion) {
+        try {
+            regionRepository.save(newRegion);
+        } catch (DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
+    }
+
+    @PutMapping(consumes = "application/json")
+    public void update(@Parameter(description = "The region to update") @Valid @RequestBody Region region) {
+        try {
+            regionRepository.save(region);
+        } catch (DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
+    }
+
+    @DeleteMapping("{id}")
+    public void delete(@Parameter(description = "Id of region to delete") @PathVariable Integer id) {
+        try {
+            regionRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tag could not be deleted");
+        }
+    }
+
 }

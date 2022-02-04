@@ -1,22 +1,21 @@
 package ch.bbcag.lor_springapi.repositories;
 
 import ch.bbcag.lor_springapi.models.Card;
-import ch.bbcag.lor_springapi.models.Rarity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
+import javax.transaction.Transactional;
 
 public interface CardRepository extends CrudRepository<Card, Integer> {
-
-    @Query("SELECT i FROM Card i WHERE i.name LIKE CONCAT('%', :name, '%')")
-    Iterable<Card> findByName(@Param("name") String name);
+    // Delete Operation. Because the id of the card is a String and not an Integer
+    @Transactional
+    void deleteById(String id);
 
     // health, cost, attack, rarity
 
-    // Kombinationen bei findUnits
-    // 4er Kombination
+    // findUnits Combinations of following attributes (health, cost, attack, rarity)
+    // Combinations of 4 (1)
 
     @Query("SELECT i FROM Card i JOIN i.rarity r WHERE r.name LIKE CONCAT('%', :rarity, '%') AND i.cost=:cost AND i.health=:health AND i.attack=:attack")
     Iterable<Card> findByHealthAndAttackAndCostAndRarity(@Param("rarity") String rarity,
@@ -24,7 +23,7 @@ public interface CardRepository extends CrudRepository<Card, Integer> {
                                                          @Param("cost") int cost,
                                                          @Param("attack") int attack);
 
-    // 3er Kombinationen (4)
+    // Combinations of 3 (4)
 
     @Query("SELECT i FROM Card i JOIN i.rarity r WHERE r.name LIKE CONCAT('%', :rarity, '%') AND i.cost=:cost AND i.health=:health AND i.attack=:attack")
     Iterable<Card> findByHealthAndAttackAndRarity(@Param("rarity") String rarity,
@@ -43,7 +42,7 @@ public interface CardRepository extends CrudRepository<Card, Integer> {
 
     Iterable<Card> findByHealthAndAttackAndCost(int health, int attack, int cost);
 
-    // 2er Kombinationen (6)
+    // Combinations of 2 (6)
 
     Iterable<Card> findByHealthAndCost(int health, int cost);
     Iterable<Card> findByHealthAndAttack(int health, int attack);
@@ -52,32 +51,31 @@ public interface CardRepository extends CrudRepository<Card, Integer> {
     @Query("SELECT i FROM Card i JOIN i.rarity r WHERE r.name LIKE CONCAT('%', :rarity, '%') AND i.health=:health")
     Iterable<Card> findByHealthAndRarity(@Param("rarity") String rarity, @Param("health") int health);
 
-    @Query("SELECT i FROM Card i JOIN i.rarity r WHERE r.name LIKE CONCAT('%', :rarity, '%') AND i.cost=:cost")
+    @Query("SELECT i FROM Card i JOIN i.rarity r WHERE r.name LIKE CONCAT('%', :rarity, '%') AND i.cost=:cost AND i.type = 'Unit'")
     Iterable<Card> findByCostAndRarity(@Param("rarity") String rarity, @Param("cost") int cost);
 
     @Query("SELECT i FROM Card i JOIN i.rarity r WHERE r.name LIKE CONCAT('%', :rarity, '%') AND i.health=:health")
     Iterable<Card> findByAttackAndRarity(@Param("rarity") String rarity, @Param("health") int health);
 
-    // Einzel (4)
+    // Single Queries (4)
 
     Iterable<Card> findByHealth(int health);
     Iterable<Card> findByAttack(int attack);
-    Iterable<Card> findByCost(int cost);
+    Iterable<Card> findByCostAndType(int cost, String type);
 
-    @Query("SELECT i FROM Card i JOIN i.rarity r WHERE r.name LIKE CONCAT('%', :rarity, '%')")
-    Iterable<Card> findByRarity(@Param("rarity") String rarity);
+    @Query("SELECT i FROM Card i JOIN i.rarity r WHERE r.name LIKE CONCAT('%', :rarity, '%') AND i.type = 'Unit'")
+    Iterable<Card> findUnitByRarity(@Param("rarity") String rarity);
 
-    // Kombinationen bei findSpells
-    // spellSpeed, cost, rarity
+    // findSpells Combinations of following attributes (spellSpeed, cost, rarity)
 
-    // 3er Kombinationen
+    // Combination of 3 (1)
 
     @Query("SELECT i FROM Card i JOIN i.rarity r WHERE r.name LIKE CONCAT('%', :rarity, '%') AND i.spellSpeed LIKE CONCAT('%', :spellSpeed, '%') AND i.cost=:cost")
     Iterable<Card> findByRarityAndSpellSpeedAndCost(@Param("rarity") String rarity,
                                                     @Param("spellSpeed") String spellSpeed,
                                                     @Param("cost") int cost);
 
-    // 2er Kombinationen
+    // Combinations of 2 (3)
 
     Iterable<Card> findBySpellSpeedAndCost(String spellSpeed, int cost);
 
@@ -85,17 +83,27 @@ public interface CardRepository extends CrudRepository<Card, Integer> {
     Iterable<Card> findByRarityAndSpellSpeed(@Param("rarity") String rarity,
                                              @Param("spellSpeed") String spellSpeed);
 
-    @Query("SELECT i FROM Card i JOIN i.rarity r WHERE r.name LIKE CONCAT('%', :rarity, '%') AND i.cost=:cost AND i.type='Spell'")
+    @Query("SELECT i FROM Card i JOIN i.rarity r WHERE r.name LIKE CONCAT('%', :rarity, '%') AND i.cost=:cost AND i.type = 'Spell'")
     Iterable<Card> findSpellByRarityAndCost(@Param("rarity") String rarity,
-                                            @Param("cost") String cost);
+                                            @Param("cost") int cost);
 
-    // übrige 1er Kombinationen
+    // single Operations
+
+    @Query("SELECT i FROM Card i JOIN i.rarity r WHERE r.name LIKE CONCAT('%', :rarity, '%') AND i.type = 'Spell'")
+    Iterable<Card> findSpellByRarity(@Param("rarity") String rarity);
 
     Iterable<Card> findBySpellSpeed(String spellSpeed);
 
-    // find all spells
+    // find all spells/units
+    // and general cost Query
 
-    // find all units
+    Iterable<Card> findByType(String type);
+    Iterable<Card> findByCost(int cost);
+    Iterable<Card> findByNameAndCost(String name, int cost);
+
+    @Query("SELECT i FROM Card i WHERE i.name LIKE CONCAT('%', :name, '%')")
+    Iterable<Card> findByName(@Param("name") String name);
+
 
 
 

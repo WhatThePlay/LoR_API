@@ -62,7 +62,7 @@ public class Card {
             name = "card_has_keyword",
             joinColumns = @JoinColumn(name = "Card_id"),
             inverseJoinColumns = @JoinColumn(name = "Keyword_id"))
-    private Set<Region> linkedKeywords = new HashSet<>();
+    private Set<Keyword> linkedKeywords = new HashSet<>();
 
     public String getId() {
         return id;
@@ -200,11 +200,11 @@ public class Card {
         this.linkedRegions = linkedRegions;
     }
 
-    public Set<Region> getLinkedKeywords() {
+    public Set<Keyword> getLinkedKeywords() {
         return linkedKeywords;
     }
 
-    public void setLinkedKeywords(Set<Region> linkedKeywords) {
+    public void setLinkedKeywords(Set<Keyword> linkedKeywords) {
         this.linkedKeywords = linkedKeywords;
     }
 }
