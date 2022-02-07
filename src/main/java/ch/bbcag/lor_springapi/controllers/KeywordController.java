@@ -1,6 +1,7 @@
 package ch.bbcag.lor_springapi.controllers;
 
 import ch.bbcag.lor_springapi.models.Keyword;
+import ch.bbcag.lor_springapi.models.Region;
 import ch.bbcag.lor_springapi.repositories.KeywordRepository;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.security.Key;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/keyword")
@@ -26,6 +29,15 @@ public class KeywordController {
             return keywordRepository.findAll();
         }
         return keywordRepository.findByName(name);
+    }
+
+    @GetMapping(path = "{id}")
+    public Keyword findById(@Parameter(description = "Id of keyword to get") @PathVariable Integer id) {
+        try {
+            return keywordRepository.findById(id).orElseThrow();
+        } catch (NoSuchElementException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Keyword could not be found");
+        }
     }
 
     @PostMapping(consumes = "application/json")

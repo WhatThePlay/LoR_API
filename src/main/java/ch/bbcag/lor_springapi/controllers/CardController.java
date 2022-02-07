@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/card")
@@ -32,6 +33,15 @@ public class CardController {
             return cardRepository.findByName(name);
         } else {
             return cardRepository.findByNameAndCost(name, cost);
+        }
+    }
+
+    @GetMapping(path = "{id}")
+    public Iterable<Card> findById(@Parameter(description = "Id of card to get") @PathVariable String id) {
+        try {
+            return cardRepository.findById(id);
+        } catch (NoSuchElementException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Card could not be found");
         }
     }
 

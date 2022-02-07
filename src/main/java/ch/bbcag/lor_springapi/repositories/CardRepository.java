@@ -12,6 +12,8 @@ public interface CardRepository extends CrudRepository<Card, Integer> {
     @Transactional
     void deleteById(String id);
 
+    Iterable<Card> findById(String id);
+
     // health, cost, attack, rarity
 
     // findUnits Combinations of following attributes (health, cost, attack, rarity)

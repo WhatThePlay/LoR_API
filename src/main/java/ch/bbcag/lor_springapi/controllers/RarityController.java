@@ -1,6 +1,7 @@
 package ch.bbcag.lor_springapi.controllers;
 
 import ch.bbcag.lor_springapi.models.Rarity;
+import ch.bbcag.lor_springapi.models.Region;
 import ch.bbcag.lor_springapi.repositories.RarityRepository;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/rarity")
@@ -26,6 +28,15 @@ public class RarityController {
             return rarityRepository.findAll();
         }
         return rarityRepository.findByName(name);
+    }
+
+    @GetMapping(path = "{id}")
+    public Rarity findById(@Parameter(description = "Id of rarity to get") @PathVariable Integer id) {
+        try {
+            return rarityRepository.findById(id).orElseThrow();
+        } catch (NoSuchElementException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rarity could not be found");
+        }
     }
 
     @PostMapping(consumes = "application/json")

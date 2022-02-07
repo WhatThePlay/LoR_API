@@ -1,7 +1,6 @@
 package ch.bbcag.lor_springapi.controllers;
 
 import ch.bbcag.lor_springapi.models.Region;
-import ch.bbcag.lor_springapi.repositories.RegionRepository;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,7 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 import static ch.bbcag.lor_springapi.utils.TestDataUtil.getTestRegion;
 import static ch.bbcag.lor_springapi.utils.TestDataUtil.getTestRegions;
@@ -22,7 +21,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = RegionController.class)
@@ -58,14 +56,12 @@ class RegionControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private RegionRepository regionRepository;
-
-    @MockBean
     private RegionController regionController;
 
-    @Test
+
+    @Test //pass
     public void checkGet_whenNoParam_thenAllRegionsAreReturned() throws Exception {
-        doReturn(getTestRegions()).when(regionRepository).findAll();
+        doReturn(getTestRegions()).when(regionController).findByName(null);
 
         mockMvc.perform(get("/region")
                         .contentType("application/json"))
@@ -96,23 +92,24 @@ class RegionControllerTest {
                 .andExpect(jsonPath("$", hasSize(0)));
     }
 
-    @Test
+    @Test //pass
     public void checkGetById_whenValidId_thenRegionIsReturned() throws Exception {
         Region expected = getTestRegion();
-        doReturn(Optional.of(expected)).when(regionRepository).findById(1);
+        doReturn(expected).when(regionController).findById(1);
 
         mockMvc.perform(get("/region/" + 1)
-                        .contentType("application/json"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("Region1")));
+               .contentType("application/json"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.name", is("Region1")));
     }
 
     @Test
     public void checkGetById_whenInvalidId_thenIsNotFound() throws Exception {
-        doReturn(Optional.empty()).when(regionRepository).findById(0);
+        doThrow(NoSuchElementException.class).when(regionController).findById(0);
+
         mockMvc.perform(get("/region/" + 0)
-                        .contentType("application/json"))
-                .andExpect(status().isNotFound());
+               .contentType("application/json"))
+               .andExpect(status().isNotFound());
     }
 
     @Test //pass
@@ -128,7 +125,7 @@ class RegionControllerTest {
                 .andExpect(status().isCreated());
     }
 
-    @Test   // weird shit
+    @Test
     public void checkPost_whenInvalidItem_thenIsConflict() throws Exception {
         doThrow(ConstraintViolationException.class).when(regionController).insert(new Region());
 
@@ -154,6 +151,7 @@ class RegionControllerTest {
     @Test
     public void checkPut_whenInvalidRegion_thenIsConflict() throws Exception {
         doThrow(ConstraintViolationException.class).when(regionController).update(new Region());
+
 
         mockMvc.perform(put("/region")
                         .contentType("application/json")
