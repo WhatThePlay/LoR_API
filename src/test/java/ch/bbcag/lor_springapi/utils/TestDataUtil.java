@@ -24,22 +24,11 @@ public class TestDataUtil {
         rarity.setCoinCost(0);
         rarity.setShardCost(0);
 
-        Card card = new Card();
-        card.setId("id");
-        card.setName("name");
-        card.setCost(2);
-        card.setType("type");
-        card.setPicture1("pic1");
-        card.setPicture2("pic2");
-        card.setRarity(rarity);
-//        cards.add(card);
-
         for (int i = 1; i <= 4; i++) {
             Region region = new Region();
             region.setId(i);
             region.setName("Region" + i);
             region.setIcon("Icon" + i);
-            card.getLinkedRegions().add(region);
             region.setLinkedCards(cards);
             regions.add(region);
         }

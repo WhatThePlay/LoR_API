@@ -1,6 +1,7 @@
 package ch.bbcag.lor_springapi.controllers;
 
 import ch.bbcag.lor_springapi.models.Card;
+import ch.bbcag.lor_springapi.models.Keyword;
 import ch.bbcag.lor_springapi.repositories.CardRepository;
 import ch.bbcag.lor_springapi.utils.TestDataUtil;
 import org.hibernate.exception.ConstraintViolationException;
@@ -15,8 +16,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.NoSuchElementException;
 
-import static ch.bbcag.lor_springapi.utils.TestDataUtil.getTestCards;
+import static ch.bbcag.lor_springapi.utils.TestDataUtil.*;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -93,22 +95,10 @@ class CardControllerTest {
     @MockBean
     private CardController cardController;
 
-    @MockBean
-    private CardRepository cardRepository;
-
     @Test //pass
     public void checkGet_whenNoParam_thenAllCardsAreReturned() throws Exception {
         doReturn(getTestCards()).when(cardController).findCard(null, null);
 
-        mockMvc.perform(get("/card")
-                        .contentType("application/json"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(JSON_ALL_Cards));
-    }
-
-    @Test //pass
-    public void checkGet_whenNoParam_thenAllCardsAreReturned2() throws Exception {
-        when(cardRepository.findAll()).thenReturn(TestDataUtil.getTestCards());
         mockMvc.perform(get("/card")
                         .contentType("application/json"))
                 .andExpect(status().isOk())

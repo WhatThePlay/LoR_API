@@ -1,8 +1,6 @@
 package ch.bbcag.lor_springapi.controllers;
 
 import ch.bbcag.lor_springapi.models.Region;
-import ch.bbcag.lor_springapi.repositories.RegionRepository;
-import ch.bbcag.lor_springapi.services.RegionService;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,17 +10,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.server.ResponseStatusException;
-
 import javax.persistence.EntityNotFoundException;
-import java.util.NoSuchElementException;
 
 import static ch.bbcag.lor_springapi.utils.TestDataUtil.getTestRegion;
 import static ch.bbcag.lor_springapi.utils.TestDataUtil.getTestRegions;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -60,14 +56,6 @@ class RegionControllerTest {
 
     @MockBean
     private RegionController regionController;
-
-    @MockBean
-    private RegionService regionService;
-
-    @MockBean
-    private RegionRepository regionRepository;
-
-
 
     @Test //pass
     public void checkGet_whenNoParam_thenAllRegionsAreReturned() throws Exception {
@@ -115,8 +103,7 @@ class RegionControllerTest {
 
     @Test
     public void checkGetById_whenInvalidId_thenIsNotFound() throws Exception {
-        doThrow(new EntityNotFoundException()).when(regionService).findById(0);
-        //when(regionRepository.findById(0)).thenThrow(ResponseStatusException.class);
+        doThrow(new EntityNotFoundException()).when(regionController).findById(0);
 
         mockMvc.perform(get("/region/" + 0)
                .contentType("application/json"))
