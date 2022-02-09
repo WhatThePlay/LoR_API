@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.NoSuchElementException;
 
@@ -20,8 +21,7 @@ import static ch.bbcag.lor_springapi.utils.TestDataUtil.getTestRegions;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -114,7 +114,8 @@ class RegionControllerTest {
 
     @Test
     public void checkGetById_whenInvalidId_thenIsNotFound() throws Exception {
-        doThrow(NoSuchElementException.class).when(regionController).findById(0);
+        //doThrow(NoSuchElementException.class).when(regionService).findById(0);
+        when(regionRepository.findById(0)).thenThrow(ResponseStatusException.class);
 
         mockMvc.perform(get("/region/" + 0)
                .contentType("application/json"))
