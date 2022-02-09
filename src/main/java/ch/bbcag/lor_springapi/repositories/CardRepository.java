@@ -42,7 +42,7 @@ public interface CardRepository extends CrudRepository<Card, Integer> {
                                                 @Param("cost") int cost,
                                                 @Param("attack") int attack);
 
-    Iterable<Card> findByHealthAndAttackAndCost(int health, int attack, int cost);
+    Iterable<Card> findByHealthAndAttackAndCost(Integer health, Object attack, Object cost);
 
     // Combinations of 2 (6)
 

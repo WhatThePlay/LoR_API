@@ -155,7 +155,6 @@ class KeywordControllerTest {
     public void checkPut_whenInvalidKeyword_thenIsConflict() throws Exception {
         doThrow(ConstraintViolationException.class).when(keywordController).update(new Keyword());
 
-
         mockMvc.perform(put("/keyword")
                         .contentType("application/json")
                         .content("{\"wrongFieldName\":\"Keyword1\"}"))

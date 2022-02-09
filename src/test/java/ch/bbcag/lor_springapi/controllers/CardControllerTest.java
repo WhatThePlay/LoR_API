@@ -1,6 +1,8 @@
 package ch.bbcag.lor_springapi.controllers;
 
 import ch.bbcag.lor_springapi.models.Card;
+import ch.bbcag.lor_springapi.repositories.CardRepository;
+import ch.bbcag.lor_springapi.utils.TestDataUtil;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -15,8 +17,7 @@ import java.util.NoSuchElementException;
 
 import static ch.bbcag.lor_springapi.utils.TestDataUtil.getTestCards;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -92,10 +93,22 @@ class CardControllerTest {
     @MockBean
     private CardController cardController;
 
+    @MockBean
+    private CardRepository cardRepository;
+
     @Test //pass
     public void checkGet_whenNoParam_thenAllCardsAreReturned() throws Exception {
         doReturn(getTestCards()).when(cardController).findCard(null, null);
 
+        mockMvc.perform(get("/card")
+                        .contentType("application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(JSON_ALL_Cards));
+    }
+
+    @Test //pass
+    public void checkGet_whenNoParam_thenAllCardsAreReturned2() throws Exception {
+        when(cardRepository.findAll()).thenReturn(TestDataUtil.getTestCards());
         mockMvc.perform(get("/card")
                         .contentType("application/json"))
                 .andExpect(status().isOk())
@@ -135,6 +148,20 @@ class CardControllerTest {
                         .queryParam("cost", cardCost))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].cost").value(cardCost));
+    }
+
+    @Test //pass
+    public void checkGet_whenValidNameAndCost_thenCardIsReturned() throws Exception {
+        String cardName = "Name3";
+        int cardCost = 3;
+        doReturn(getTestCards().subList(2, 3)).when(cardController).findCard(cardName, cardCost);
+
+        mockMvc.perform(get("/card")
+                        .contentType("application/json")
+                        .queryParam("name", cardName)
+                        .queryParam("cost", String.valueOf(cardCost)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value(cardName));
     }
 
     @Test

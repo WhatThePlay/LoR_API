@@ -14,6 +14,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.NoSuchElementException;
 
 import static ch.bbcag.lor_springapi.utils.TestDataUtil.getTestRegion;
@@ -114,8 +115,8 @@ class RegionControllerTest {
 
     @Test
     public void checkGetById_whenInvalidId_thenIsNotFound() throws Exception {
-        //doThrow(NoSuchElementException.class).when(regionService).findById(0);
-        when(regionRepository.findById(0)).thenThrow(ResponseStatusException.class);
+        doThrow(new EntityNotFoundException()).when(regionService).findById(0);
+        //when(regionRepository.findById(0)).thenThrow(ResponseStatusException.class);
 
         mockMvc.perform(get("/region/" + 0)
                .contentType("application/json"))
