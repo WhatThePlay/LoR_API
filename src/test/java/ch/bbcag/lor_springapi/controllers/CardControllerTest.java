@@ -1,22 +1,20 @@
 package ch.bbcag.lor_springapi.controllers;
 
 import ch.bbcag.lor_springapi.models.Card;
-import ch.bbcag.lor_springapi.models.Region;
-import ch.bbcag.lor_springapi.repositories.CardRepository;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.NoSuchElementException;
 
 import static ch.bbcag.lor_springapi.utils.TestDataUtil.getTestCards;
-import static ch.bbcag.lor_springapi.utils.TestDataUtil.getTestRegions;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -117,7 +115,7 @@ class CardControllerTest {
     }
 
     @Test //pass
-    public void checkGet_whenNotExistingName_thenNoRegionsAreReturned() throws Exception {
+    public void checkGet_whenNotExistingName_thenNoCardsAreReturned() throws Exception {
         String cardName = "NotExistingCard";
 
         mockMvc.perform(get("/card")
@@ -218,6 +216,25 @@ class CardControllerTest {
                         .contentType("application/json")
                         .content("{\"wrongFieldName\":\"Card1\"}"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test //pass
+    public void checkDelete_whenValidId_thenIsOk() throws Exception {
+        mockMvc.perform(delete("/card/1")
+                        .contentType("application/json"))
+                .andExpect(status().isOk());
+
+        Mockito.verify(cardController).delete("1");
+    }
+
+    @Test
+    public void checkDelete_whenInvalidId_thenIsNotFound() throws Exception {
+        doThrow(EmptyResultDataAccessException.class).when(cardController).delete("99999");
+        mockMvc.perform(delete("/card/99999")
+                        .contentType("application/json"))
+                .andExpect(status().isNotFound());
+
+        Mockito.verify(cardController).delete("99999");
     }
 
 

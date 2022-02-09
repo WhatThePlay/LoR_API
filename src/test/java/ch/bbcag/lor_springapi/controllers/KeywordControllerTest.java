@@ -73,7 +73,7 @@ class KeywordControllerTest {
     }
 
     @Test //pass
-    public void checkGet_whenValidName_thenRegionIsReturned() throws Exception {
+    public void checkGet_whenValidName_thenKeywordIsReturned() throws Exception {
         String regionName = "Region4";
         doReturn(getTestRegions().subList(3, 4)).when(keywordController).findByName(regionName);
 
@@ -85,7 +85,7 @@ class KeywordControllerTest {
     }
 
     @Test //pass
-    public void checkGet_whenNotExistingName_thenNoRegionsAreReturned() throws Exception {
+    public void checkGet_whenNotExistingName_thenNoKeywordsAreReturned() throws Exception {
         String regionName = "NotExistingRegion";
 
         mockMvc.perform(get("/keyword")
@@ -96,7 +96,7 @@ class KeywordControllerTest {
     }
 
     @Test //pass
-    public void checkGetById_whenValidId_thenRegionIsReturned() throws Exception {
+    public void checkGetById_whenValidId_thenKeywordIsReturned() throws Exception {
         Keyword expected = getTestKeyword();
         doReturn(expected).when(keywordController).findById(1);
 
@@ -116,7 +116,7 @@ class KeywordControllerTest {
     }
 
     @Test //pass
-    public void checkPost_whenNewRegion_thenIsOk() throws Exception {
+    public void checkPost_whenNewKeyword_thenIsOk() throws Exception {
         mockMvc.perform(post("/keyword")
                         .contentType("application/json")
                         .content("{\n" +
@@ -139,7 +139,7 @@ class KeywordControllerTest {
     }
 
     @Test //pass
-    public void checkPut_whenValidRegion_thenIsOk() throws Exception {
+    public void checkPut_whenValidKeyword_thenIsOk() throws Exception {
         mockMvc.perform(put("/keyword")
                         .contentType("application/json")
                         .content("{\n" +
@@ -152,7 +152,7 @@ class KeywordControllerTest {
     }
 
     @Test
-    public void checkPut_whenInvalidRegion_thenIsConflict() throws Exception {
+    public void checkPut_whenInvalidKeyword_thenIsConflict() throws Exception {
         doThrow(ConstraintViolationException.class).when(keywordController).update(new Keyword());
 
 

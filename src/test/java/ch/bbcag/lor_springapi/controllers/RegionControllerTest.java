@@ -1,6 +1,8 @@
 package ch.bbcag.lor_springapi.controllers;
 
 import ch.bbcag.lor_springapi.models.Region;
+import ch.bbcag.lor_springapi.repositories.RegionRepository;
+import ch.bbcag.lor_springapi.services.RegionService;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -57,6 +59,13 @@ class RegionControllerTest {
 
     @MockBean
     private RegionController regionController;
+
+    @MockBean
+    private RegionService regionService;
+
+    @MockBean
+    private RegionRepository regionRepository;
+
 
 
     @Test //pass
@@ -126,7 +135,7 @@ class RegionControllerTest {
     }
 
     @Test
-    public void checkPost_whenInvalidItem_thenIsConflict() throws Exception {
+    public void checkPost_whenInvalidRegion_thenIsConflict() throws Exception {
         doThrow(ConstraintViolationException.class).when(regionController).insert(new Region());
 
         mockMvc.perform(post("/region")
