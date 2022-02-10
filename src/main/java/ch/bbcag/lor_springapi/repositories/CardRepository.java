@@ -7,12 +7,10 @@ import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
 
-public interface CardRepository extends CrudRepository<Card, Integer> {
+public interface CardRepository extends CrudRepository<Card, String> {
     // Delete Operation. Because the id of the card is a String and not an Integer
     @Transactional
     void deleteById(String id);
-
-    Iterable<Card> findById(String id);
 
     // health, cost, attack, rarity
 

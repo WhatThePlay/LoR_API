@@ -53,9 +53,9 @@ public class CardController {
             @ApiResponse(responseCode = "404", description = "Card not found",
                     content = @Content)})
     @GetMapping(path = "{id}")
-    public Iterable<Card> findById(@Parameter(description = "Id of card to get") @PathVariable String id) {
+    public Card findById(@Parameter(description = "Id of card to get") @PathVariable String id) {
         try {
-            return cardRepository.findById(id);
+            return cardRepository.findById(id).orElseThrow();
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Card could not be found");
         }
@@ -184,7 +184,7 @@ public class CardController {
     public void delete(@Parameter(description = "Id of card to delete") @PathVariable String id) {
         try {
             cardRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException ex) {
+        } catch (NoSuchElementException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Keyword could not be deleted");
         }
     }

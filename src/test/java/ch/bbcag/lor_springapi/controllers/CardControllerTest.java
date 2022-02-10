@@ -1,22 +1,20 @@
 package ch.bbcag.lor_springapi.controllers;
 
-import ch.bbcag.lor_springapi.models.Card;
-import org.hibernate.exception.ConstraintViolationException;
+import ch.bbcag.lor_springapi.repositories.CardRepository;
+import ch.bbcag.lor_springapi.utils.TestDataUtil;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.NoSuchElementException;
 
-import static ch.bbcag.lor_springapi.utils.TestDataUtil.getTestCards;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -90,12 +88,11 @@ class CardControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CardController cardController;
+    private CardRepository cardRepository;
 
     @Test //pass
     public void checkGet_whenNoParam_thenAllCardsAreReturned() throws Exception {
-        doReturn(getTestCards()).when(cardController).findCard(null, null);
-
+        when(cardRepository.findAll()).thenReturn(TestDataUtil.getTestCards());
         mockMvc.perform(get("/card")
                         .contentType("application/json"))
                 .andExpect(status().isOk())
@@ -105,7 +102,7 @@ class CardControllerTest {
     @Test //pass
     public void checkGet_whenValidName_thenCardIsReturned() throws Exception {
         String cardName = "Name3";
-        doReturn(getTestCards().subList(2, 3)).when(cardController).findCard(cardName, null);
+        when(cardRepository.findByName(cardName)).thenReturn(TestDataUtil.getTestCards().subList(2, 3));
 
         mockMvc.perform(get("/card")
                         .contentType("application/json")
@@ -128,7 +125,7 @@ class CardControllerTest {
     @Test //pass
     public void checkGet_whenValidCost_thenCardIsReturned() throws Exception {
         String cardCost = "3";
-        doReturn(getTestCards().subList(2, 3)).when(cardController).findCard(null, 3);
+        when(cardRepository.findByCostAndRarity(any(), eq(1))).thenReturn(TestDataUtil.getTestCards().subList(0, 1));
 
         mockMvc.perform(get("/card")
                         .contentType("application/json")
@@ -139,8 +136,7 @@ class CardControllerTest {
 
     @Test
     public void checkGetById_whenInvalidId_thenIsNotFound() throws Exception {
-        doThrow(NoSuchElementException.class).when(cardController).findById("ID0");
-
+        when(cardRepository.findById("IDO")).thenThrow(NoSuchElementException.class);
         mockMvc.perform(get("/card/ID0")
                         .contentType("application/json"))
                 .andExpect(status().isNotFound());
@@ -174,8 +170,6 @@ class CardControllerTest {
 
     @Test
     public void checkPost_whenInvalidCard_thenIsConflict() throws Exception {
-        doThrow(ConstraintViolationException.class).when(cardController).insert(new Card());
-
         mockMvc.perform(post("/card")
                         .contentType("application/json")
                         .content("{\"wrongFieldName\":\"Region1\"}"))
@@ -205,13 +199,11 @@ class CardControllerTest {
                                 "\"linkedRegions\": [],\n" +
                                 "\"linkedKeywords\": []\n" +
                                 "}"))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
     }
 
     @Test
     public void checkPut_whenInvalidCard_thenIsConflict() throws Exception {
-        doThrow(ConstraintViolationException.class).when(cardController).update(new Card());
-
         mockMvc.perform(put("/card")
                         .contentType("application/json")
                         .content("{\"wrongFieldName\":\"Card1\"}"))
@@ -220,34 +212,21 @@ class CardControllerTest {
 
     @Test //pass
     public void checkDelete_whenValidId_thenIsOk() throws Exception {
-        mockMvc.perform(delete("/card/1")
+        mockMvc.perform(delete("/card/ID1")
                         .contentType("application/json"))
                 .andExpect(status().isOk());
 
-        Mockito.verify(cardController).delete("1");
+        verify(cardRepository).deleteById("ID1");
     }
 
     @Test
     public void checkDelete_whenInvalidId_thenIsNotFound() throws Exception {
-        doThrow(EmptyResultDataAccessException.class).when(cardController).delete("99999");
+        doThrow(NoSuchElementException.class).when(cardRepository).deleteById("99999");
+
         mockMvc.perform(delete("/card/99999")
                         .contentType("application/json"))
                 .andExpect(status().isNotFound());
-
-        Mockito.verify(cardController).delete("99999");
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //    @Test
