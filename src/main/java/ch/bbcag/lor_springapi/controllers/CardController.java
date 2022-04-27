@@ -185,7 +185,7 @@ public class CardController {
         try {
             cardRepository.deleteById(id);
         } catch (EmptyResultDataAccessException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Keyword could not be deleted");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Card could not be deleted");
         }
     }
 
