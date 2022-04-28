@@ -15,6 +15,9 @@ public class Region {
 
     private String name;
     private String icon;
+    private String crest;
+    private String motto;
+    private String description;
 
     @ManyToMany(mappedBy = "linkedRegions")
     @JsonBackReference
@@ -42,6 +45,30 @@ public class Region {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public String getCrest() {
+        return crest;
+    }
+
+    public void setCrest(String crest) {
+        this.crest = crest;
+    }
+
+    public String getMotto() {
+        return motto;
+    }
+
+    public void setMotto(String motto) {
+        this.motto = motto;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Set<Card> getLinkedCards() {
